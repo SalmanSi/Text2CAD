@@ -66,10 +66,11 @@ def main():
 
     config = parse_config_file(args.config_path)
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    t2clogger.info(
-        "Current Device {}",
-        torch.cuda.get_device_properties(device),
-    )
+    if device == "cuda":
+        t2clogger.info("Current Device {}", torch.cuda.get_device_properties(device))
+    else:
+        t2clogger.info("Running on CPU (no CUDA available)")
+
 
     # -------------------------------- Load Model -------------------------------- #
     cad_config = config["cad_decoder"]
@@ -194,7 +195,7 @@ def test_model(
                 maxlen=MAX_CAD_SEQUENCE_LENGTH,
                 nucleus_prob=0,
                 topk_index=TOPK,
-                device="cuda" if torch.cuda.is_available() else "cpu",
+                device=device
             )
             # Save the results batchwise
             for i in range(
